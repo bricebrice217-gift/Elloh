@@ -227,6 +227,50 @@ const server = http.createServer(async (req, res) => {
     const parsedUrl = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
     const pathname = decodeURIComponent(parsedUrl.pathname);
 
+    // === SEO : robots.txt (indexation des moteurs de recherche autorisée) ===
+    if (pathname === '/robots.txt' && req.method === 'GET') {
+      res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.end(
+        [
+          'User-agent: *',
+          'Allow: /',
+          '',
+          'Sitemap: https://elloh-gkn3.onrender.com/sitemap.xml',
+          ''
+        ].join('\n')
+      );
+      return;
+    }
+
+    // === SEO : sitemap.xml (plan du site pour Google / Bing) ===
+    if (pathname === '/sitemap.xml' && req.method === 'GET') {
+      const base = 'https://elloh-gkn3.onrender.com';
+      const today = new Date().toISOString().slice(0, 10);
+      const urls = [
+        { loc: '/', priority: '1.0', changefreq: 'weekly' },
+        { loc: '/studio', priority: '0.9', changefreq: 'weekly' },
+        { loc: '/projets', priority: '0.8', changefreq: 'daily' }
+      ];
+      const xml =
+        '<?xml version="1.0" encoding="UTF-8"?>\n' +
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+        urls
+          .map(
+            (u) =>
+              '  <url>\n' +
+              `    <loc>${base}${u.loc}</loc>\n` +
+              `    <lastmod>${today}</lastmod>\n` +
+              `    <changefreq>${u.changefreq}</changefreq>\n` +
+              `    <priority>${u.priority}</priority>\n` +
+              '  </url>'
+          )
+          .join('\n') +
+        '\n</urlset>\n';
+      res.writeHead(200, { 'Content-Type': 'application/xml; charset=utf-8' });
+      res.end(xml);
+      return;
+    }
+
     if (pathname === '/api/health' && req.method === 'GET') {
       const db = readDb();
       return sendJson(res, 200, {
