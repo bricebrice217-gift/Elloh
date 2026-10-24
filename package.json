@@ -1,0 +1,23 @@
+{
+  "name": "gbadia-univerty",
+  "version": "2.0.0",
+  "description": "GBADIA UNIVERTY — Plateforme IA Génératrice de Sites Web & Applications",
+  "main": "server.js",
+  "scripts": {
+    "build:css": "npx @tailwindcss/cli -i ./src/styles.css -o ./public/assets/app.css --minify",
+    "build:js": "npx esbuild ./src/main.jsx --bundle --outfile=./public/assets/app.js --loader:.js=jsx --loader:.jsx=jsx --define:process.env.NODE_ENV='\"production\"' --minify",
+    "build": "npm run build:css && npm run build:js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "lucide-react": "^1.61.0",
+    "qrcode": "^1.5.4",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "esbuild": "^0.25.12",
+    "tailwindcss": "^4.3.3"
+  }
+}
